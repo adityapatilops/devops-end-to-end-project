@@ -19,7 +19,7 @@ stages {
 
     stage('Remove Old Container') {
         steps {
-            bat 'docker rm -f flask-container || exit 0'
+            bat 'docker rm -f flask-container'
         }
     }
 
@@ -28,6 +28,7 @@ stages {
             bat 'docker run -d -p 5000:5000 --name flask-container flask-app'
         }
     }
+
 }
 ```
 
