@@ -1,9 +1,14 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "adityapatilops/flask-app"
+        IMAGE_TAG = "v2"
+    }
+
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/adityapatilops/devops-end-to-end-project.git'
@@ -12,19 +17,25 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t flask-app .'
+                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
             }
         }
 
-        stage('Remove Old Container') {
+        stage('Docker Login') {
             steps {
-                bat 'docker rm -f flask-container'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Push Docker Image') {
             steps {
-                bat 'docker run -d -p 5000:5000 --name flask-container flask-app'
+                bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
             }
         }
     }
