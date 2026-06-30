@@ -23,14 +23,13 @@ pipeline {
             }
         }
 
-        stage('Docker Login Test') {
+        stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-new',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
                     bat '''
                     echo USER=%DOCKER_USER%
                     docker logout
