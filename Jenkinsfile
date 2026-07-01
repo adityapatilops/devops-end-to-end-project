@@ -32,7 +32,6 @@ pipeline {
                 )]) {
                     bat '''
                     echo USER=%DOCKER_USER%
-                    docker logout
                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
                     '''
                 }
@@ -53,7 +52,7 @@ pipeline {
                     "docker pull %IMAGE_NAME%:%IMAGE_TAG% && ^
                     docker stop flask-container || true && ^
                     docker rm flask-container || true && ^
-                    docker run -d --name flask-container -p 5000:5000 %IMAGE_NAME%:%IMAGE_TAG%"
+                    docker run -d --restart=always --name flask-container -p 5000:5000 %IMAGE_NAME%:%IMAGE_TAG%"
                     """
                 }
             }
