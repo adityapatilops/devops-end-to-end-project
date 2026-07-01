@@ -23,16 +23,18 @@ pipeline {
             }
         }
 
-        stage('Docker Login') {
+        stage('Docker Login Test') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-new',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
+
                     bat '''
                     echo USER=%DOCKER_USER%
-                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    docker logout
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
                     '''
                 }
             }
@@ -52,7 +54,7 @@ pipeline {
                     "docker pull %IMAGE_NAME%:%IMAGE_TAG% && ^
                     docker stop flask-container || true && ^
                     docker rm flask-container || true && ^
-                    docker run -d --restart=always --name flask-container -p 5000:5000 %IMAGE_NAME%:%IMAGE_TAG%"
+                    docker run -d --name flask-container -p 5000:5000 %IMAGE_NAME%:%IMAGE_TAG%"
                     """
                 }
             }
